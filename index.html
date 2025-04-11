@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Final Message</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            line-height: 2;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 2rem;
+            white-space: pre-line;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+            animation-delay: 1s;
+            overflow-y: auto;
+            max-height: 85vh;
+            scrollbar-width: thin;
+            scrollbar-color: #fff #000;
+            scroll-behavior: smooth;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #fff;
+        }
+
+        .message {
+            text-align: left;
+            position: relative;
+            line-height: 2.2;
+            padding-bottom: 50vh;
+        }
+
+        .typed {
+            border-right: 1px solid rgba(255, 255, 255, 0.7);
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .space { height: 2em; }
+        .break { height: 3em; }
+
+        .highlight {
+            color: #ff9999;
+            font-weight: bold;
+        }
+
+        .equation {
+            display: block;
+            text-align: center;
+            font-size: 1.4em;
+            padding: 1em 0;
+            color: #88ccff;
+        }
+
+        .date {
+            color: #aaffaa;
+            font-weight: bold;
+        }
+
+        .audio-control {
+            position: fixed;
+            border: 2px solid gray;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            z-index: 1000;
+            transition-duration: 300ms;
+        }
+
+        .audio-control:hover {
+            scale: 1.1;
+            background: rgba(255, 255, 255, 0.2);
+            
+        }
+
+        .pause-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .start-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: opacity 1s ease;
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgm" loop>
+        <source src="https://audio.jukehost.co.uk/bjS3jphldf3vw0h7nrW6TQSPtml3qeXH">
+    </audio>
+    
+    <div class="container">
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="audio-control" id="audioControl">
+        <button class="pause-btn" id="pauseBtn">||</button>
+    </div>
+
+    <div class="start-prompt" id="startPrompt">
+        <p>Click anywhere to begin</p>
+    </div>
+
+    <script>
+    const text = `I entered 11th PCM B with hope. 
+    I still remember the roast, 
+    the massacre-like food sharing,
+    and those English periods.
+    Even though I failed, 
+    I felt betrayed from one side, 
+    and some wannabe... whatever.
+
+But it never stopped me from still being with you all. 
+I never thought we would share a harmonic relationship, 
+but it seems it was only me who felt that way. 
+Everything was dried out, 
+but I was desperate to repair it and make it glow like never before.
+
+After you all were gone, 
+I missed that zone. 
+I used to check the calendar, 
+wondering when we would meet again. 
+I had these delusional dreams about the future. 
+I always said, 
+"<span class="highlight">Ever you need help, just call me.</span>" 
+I always made wishes for the wellbeing of your lives! 
+Even ignored how somebody might get selfish. 
+I loved you all guys.
+
+<span class="equation">G = M ∪ {k}</span>
+
+I was being too childish towards you all - blind with my feelings, 
+my tears, my "great" gestures towards you and "her." 
+All of it was wasted in a sequence of 5 minutes. 
+I wasted time on delusional things, 
+realizing too late, like Franz did after learning German.
+
+On <span class="date">March 11, 2025</span>, when I came to know where you were,
+I came in uniform as I had just arrived from school,
+riding at 87 km/hr on a 110cc machine.
+I came inside and seated myself by your side,
+but you told me to go out for a few minutes. 
+Then I waited for a message for 5 minutes, 
+and it gave me a sign that I was far away from you.
+
+I never realized the paradox happening to me. 
+Always against eliteness, 
+yet seeking approval. 
+You broke my heart, 
+but I learned a lesson: never become so attached to anyone.
+
+At the end, all relations, prayers, memories, and dreams - I'm putting them all to rest in peace. It was a good history, but it will never end up becoming a future.`;
+
+    let index = 0;
+    const messageEl = document.getElementById('message');
+    let isTyping = true;
+    let isPaused = false;
+    const bgm = document.getElementById('bgm');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const audioControl = document.getElementById('audioControl');
+    const startPrompt = document.getElementById('startPrompt');
+
+    function typeWriter() {
+        if (isPaused) return;
+        
+        if (index < text.length && isTyping) {
+            messageEl.innerHTML = text.slice(0, index + 1) + '<span class="typed"></span>';
+            index++;
+            
+            // Vary typing speed based on punctuation
+            let delay = 50;
+            if (text[index] === '.') delay = 400;
+            else if (text[index] === ',') delay = 200;
+            else if (text[index] === '\n') delay = 800;
+            
+            // Auto-scroll after each character
+            requestAnimationFrame(() => {
+                messageEl.parentElement.scrollTo({
+                    top: messageEl.parentElement.scrollHeight,
+                    behavior: 'auto'
+                });
+            });
+            
+            setTimeout(typeWriter, delay);
+        } else {
+            messageEl.innerHTML = text;
+        }
+    }
+
+    pauseBtn.addEventListener('click', function() {
+        if (isPaused) {
+            isPaused = false;
+            typeWriter();
+            bgm.play();
+            pauseBtn.textContent = '||';
+        } else {
+            isPaused = true;
+            bgm.pause();
+            pauseBtn.textContent = '▶';
+        }
+    });
+
+    window.onload = () => {
+        audioControl.style.display = 'none';
+        bgm.volume = 0.7;
+        
+        // Start typing and music on first click
+        document.addEventListener('click', function startExperience() {
+            startPrompt.classList.add('fade-out');
+            setTimeout(() => {
+                startPrompt.style.display = 'none';
+            }, 1000);
+            
+            typeWriter();
+            bgm.play().catch(err => console.log('Audio playback failed:', err));
+            document.querySelector('.container').style.opacity = 1;
+            audioControl.style.display = 'flex';
+            document.removeEventListener('click', startExperience);
+        }, { once: true });
+    };
+
+    // Add keyboard controls
+    document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            if (isPaused) {
+                isPaused = false;
+                typeWriter();
+                bgm.play();
+                pauseBtn.textContent = '||';
+            } else {
+                isPaused = true;
+                bgm.pause();
+                pauseBtn.textContent = '▶';
+            }
+        }
+    });
+    </script>
+</body>
+</html>
